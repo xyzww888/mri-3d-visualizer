@@ -1,0 +1,31 @@
+{
+  "name": "mri-3d-visualizer",
+  "version": "1.0.0",
+  "description": "High-fidelity 3D Magnetic Resonance Imaging (MRI) device visualizer built with Three.js and Blender.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "threejs",
+    "webgl",
+    "blender",
+    "mri",
+    "medical-device",
+    "3d-visualization",
+    "gltf"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "lil-gui": "^0.20.0",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.170.0",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.1"
+  }
+}

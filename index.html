@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MRI 3D Visualizer | 核磁共振设备真实3D可视化系统</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/assets/styles/main.css" />
+  </head>
+  <body>
+    <!-- Three.js Canvas Container -->
+    <div id="app">
+      <canvas id="webgl"></canvas>
+
+      <!-- Top Header / HUD Bar -->
+      <header class="hud-header">
+        <div class="hud-brand">
+          <div class="hud-logo">
+            <svg viewBox="0 0 100 100" width="28" height="28">
+              <circle cx="50" cy="50" r="34" fill="none" stroke="#00D2FF" stroke-width="12" />
+              <circle cx="50" cy="50" r="16" fill="#1E293B" />
+              <rect x="25" y="47" width="50" height="6" rx="3" fill="#38BDF8" />
+            </svg>
+          </div>
+          <div class="hud-title-group">
+            <h1>MRI 3D Digital Twin Visualizer</h1>
+            <p>核磁共振设备高保真 3D 数字化孪生系统 (Three.js + Blender)</p>
+          </div>
+        </div>
+
+        <div class="hud-status">
+          <span id="model-source-badge" class="badge badge-warning">
+            <span class="badge-dot"></span>
+            <span id="model-source-text">检测模型资源中...</span>
+          </span>
+        </div>
+      </header>
+
+      <!-- Left Control Toolbar -->
+      <aside class="hud-sidebar">
+        <div class="sidebar-section">
+          <h3>视角预设 (Camera Views)</h3>
+          <div class="view-buttons">
+            <button class="btn btn-view active" data-view="perspective">默认视角</button>
+            <button class="btn btn-view" data-view="front">正面视角</button>
+            <button class="btn btn-view" data-view="bore">扫描孔径</button>
+            <button class="btn btn-view" data-view="bed">检查床位</button>
+            <button class="btn btn-view" data-view="top">俯视全景</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>动态交互 (Interactive Actions)</h3>
+          <div class="action-buttons">
+            <button id="btn-toggle-bed" class="btn btn-primary">
+              <span class="btn-icon">⇆</span>
+              <span id="bed-btn-text">平移检查床 (进孔/出孔)</span>
+            </button>
+            <button id="btn-toggle-annotations" class="btn btn-outline">
+              <span class="btn-icon">◉</span>
+              <span>部件标记显隐</span>
+            </button>
+            <button id="btn-toggle-wireframe" class="btn btn-outline">
+              <span class="btn-icon">⬡</span>
+              <span>结构线框模式</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>快捷说明</h3>
+          <p class="sidebar-tip">
+            • 鼠标左键拖拽：旋转视角<br />
+            • 鼠标滚轮缩放：放大/缩小<br />
+            • 鼠标右键拖拽：平移镜头<br />
+            • 点击 3D 浮动标签：快速聚焦部件
+          </p>
+        </div>
+      </aside>
+
+      <!-- 3D Annotations Layer -->
+      <div id="annotations-container" class="annotations-overlay"></div>
+
+      <!-- Detail Info Card for Clicked Parts -->
+      <div id="info-modal" class="info-card hidden">
+        <button id="btn-close-modal" class="close-btn">&times;</button>
+        <div class="info-tag" id="info-tag">部件详情</div>
+        <h2 id="info-title">部件名称</h2>
+        <p id="info-desc">部件功能描述...</p>
+        <div class="info-specs" id="info-specs"></div>
+      </div>
+
+      <!-- Loading Screen Overlay -->
+      <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-card">
+          <div class="loading-spinner"></div>
+          <h2>加载 MRI 3D 场景</h2>
+          <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+          <p id="loading-text" class="loading-sub">初始化渲染引擎与环境光照...</p>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
