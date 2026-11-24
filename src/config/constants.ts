@@ -8,29 +8,34 @@ export interface CameraViewPreset {
 
 export const CAMERA_VIEWS: Record<string, CameraViewPreset> = {
   perspective: {
-    name: '默认透视',
-    position: new THREE.Vector3(3.2, 2.2, 3.8),
-    target: new THREE.Vector3(0, 1.1, 0.4)
+    name: '经典左前视角',
+    position: new THREE.Vector3(-3.82, 1.86, 4.78),
+    target: new THREE.Vector3(-0.22, 1.04, 0.80)
   },
   front: {
-    name: '正面机体',
-    position: new THREE.Vector3(0.0, 1.3, 4.2),
-    target: new THREE.Vector3(0, 1.15, 0.5)
+    name: '正面对称视角',
+    position: new THREE.Vector3(-0.10, 1.28, 4.55),
+    target: new THREE.Vector3(-0.10, 1.15, 0.65)
   },
   bore: {
-    name: '扫描孔径',
-    position: new THREE.Vector3(0.0, 1.15, 1.7),
-    target: new THREE.Vector3(0, 1.15, -0.6)
+    name: '75cm 超大孔径',
+    position: new THREE.Vector3(0.0, 1.18, 2.08),
+    target: new THREE.Vector3(0, 1.12, -0.5)
   },
   bed: {
-    name: '检查床位',
-    position: new THREE.Vector3(2.4, 1.4, 1.8),
-    target: new THREE.Vector3(0, 0.9, 1.2)
+    name: '极简升降床台',
+    position: new THREE.Vector3(-2.35, 1.42, 2.85),
+    target: new THREE.Vector3(0, 0.82, 1.75)
+  },
+  cryo: {
+    name: '右前透视视角',
+    position: new THREE.Vector3(3.45, 1.88, 4.15),
+    target: new THREE.Vector3(-0.05, 1.08, 0.65)
   },
   top: {
-    name: '俯视全景',
-    position: new THREE.Vector3(0.0, 5.0, 0.5),
-    target: new THREE.Vector3(0, 0.8, 0.5)
+    name: '俯视建筑轮廓',
+    position: new THREE.Vector3(-0.15, 5.4, 1.0),
+    target: new THREE.Vector3(-0.15, 0.9, 0.85)
   }
 };
 
@@ -38,6 +43,7 @@ export interface AnnotationItem {
   id: string;
   index: number;
   name: string;
+  shortLabel: string;
   category: string;
   position: THREE.Vector3;
   targetView: {
@@ -52,89 +58,112 @@ export const ANNOTATIONS_DATA: AnnotationItem[] = [
   {
     id: 'gantry',
     index: 1,
-    name: '主磁体机架 (Magnet Gantry)',
-    category: '核心硬件',
-    position: new THREE.Vector3(0, 2.1, 0.2),
+    name: '非对称雕塑一体式机架 (P-Arch Monolith)',
+    shortLabel: '极简雕塑主机',
+    category: '工业设计',
+    position: new THREE.Vector3(-1.02, 1.92, 0.75),
     targetView: {
-      position: new THREE.Vector3(2.8, 2.2, 3.2),
-      target: new THREE.Vector3(0, 1.3, 0)
+      position: new THREE.Vector3(-3.1, 1.85, 3.6),
+      target: new THREE.Vector3(-0.35, 1.20, 0.25)
     },
-    description: '采用高均匀度超导磁体，内部浸泡在液氦零下269℃超低温杜瓦瓶中，维持稳定强磁场。',
+    description: '还原联影 uMR Omega 标志性建筑美学：左侧垂直落地纯白立方体与右侧同心圆弧相切过渡，外凸圆形前盘镶嵌一整圈喷砂阳极氧化银铝饰环。',
     specs: {
-      '场强标称': '1.5T / 3.0T / 5.0T',
-      '外形高度': '2,200 mm',
-      '整机重量': '约 5,000 ~ 7,500 kg',
-      '冷却介质': '液氦 (Zero Boil-off 零挥发技术)'
+      '静磁场强': '3.0 Tesla (97cm 超大净磁体)',
+      '设计语言': '纯白珠光缎面 + 喷砂阳极氧化铝环',
+      '最大视野': '60 × 60 × 50 cm³ 超大 FOV',
+      '梯度性能': '3.5 MW 峰值功率 · 200 T/m/s'
     }
   },
   {
     id: 'bore',
     index: 2,
-    name: '患者检查孔 (Patient Bore)',
-    category: '患者体验',
-    position: new THREE.Vector3(0, 1.2, 0.1),
+    name: '75cm 纯白渐扩孔径 & Starlight 星空光幕',
+    shortLabel: '75cm 宽境孔径',
+    category: '头等舱体验',
+    position: new THREE.Vector3(0, 1.54, 0.85),
     targetView: {
-      position: new THREE.Vector3(0, 1.2, 2.0),
-      target: new THREE.Vector3(0, 1.15, -0.5)
+      position: new THREE.Vector3(0.0, 1.18, 2.05),
+      target: new THREE.Vector3(0, 1.12, -0.5)
     },
-    description: '内部集成梯度线圈系统与患者舒适环境控制，配备动态环境氛围光环与主动降噪吸音筒壁。',
+    description: '业界首创 75cm 超大孔径采用无螺钉纯白一体喇叭口曲面，内壁嵌入纤细冰蓝月牙氛围灯条与顶部 Starlight 光纤星空穹顶。',
     specs: {
-      '孔径直径': '700 mm (大孔径舒适型)',
-      '梯度场强': '45 ~ 80 mT/m',
-      '切换率': '200 T/m/s',
-      '孔内照明': '双向无磁 LED 环形呼吸调光'
-    }
-  },
-  {
-    id: 'patient-table',
-    index: 3,
-    name: '智能平移升降检查床 (Patient Couch)',
-    category: '传动系统',
-    position: new THREE.Vector3(0, 0.85, 1.5),
-    targetView: {
-      position: new THREE.Vector3(2.2, 1.4, 2.0),
-      target: new THREE.Vector3(0, 0.85, 1.3)
-    },
-    description: '全无磁电动伺服升降与微米级水平进退，配置内置射频背板线圈以及压力感应安全系统。',
-    specs: {
-      '床身长度': '2,400 mm',
-      '最大承重': '250 kg',
-      '水平移动': '全自动进退行程 1,800 mm',
-      '定位精度': '± 0.5 mm'
+      '净空孔径': '750 mm (空间提升 33%)',
+      '孔内照明': '双侧纤细月牙灯弧 + Starlight 星空',
+      '静音技术': 'uAIFI QScan 全序列静音扫描',
+      '准直系统': '12 点位微缝隐藏式激光准直窗'
     }
   },
   {
     id: 'touch-screen',
-    index: 4,
-    name: '双侧智能交互触控屏 (Dual Side Displays)',
+    index: 3,
+    name: '双侧纯平梯形黑晶触控屏 (Flush OLED)',
+    shortLabel: '纯平梯形触控屏',
     category: '人机交互',
-    position: new THREE.Vector3(0.95, 1.65, 0.65),
+    position: new THREE.Vector3(-0.78, 1.28, 0.86),
     targetView: {
-      position: new THREE.Vector3(1.6, 1.7, 1.2),
-      target: new THREE.Vector3(0.95, 1.65, 0.65)
+      position: new THREE.Vector3(-1.15, 1.38, 2.05),
+      target: new THREE.Vector3(-0.55, 1.25, 0.82)
     },
-    description: '医护人员可在机架两侧直观查看患者信息、进行激光准直对焦以及一键智能摆位。',
+    description: '摒弃传统外挂支架屏幕，在圆形前面板 3 点与 9 点位纯平嵌入水平弧边梯形曜石黑晶 OLED 屏，实现患者信息确认与一键智能摆位。',
     specs: {
-      '屏幕尺寸': '12.1 英寸医用高清电容屏',
-      '防护等级': 'IPX5 防液体泼溅',
-      '主要功能': '患者注册、激光定位、自动进床'
+      '嵌入形态': '0 凸起同心圆弧梯形纯平黑晶玻璃',
+      '智能平台': 'uAIFI 类脑平台 · EasyScan 一键摆位',
+      '生理感知': 'EasySense 非接触毫米波呼吸门控'
+    }
+  },
+  {
+    id: 'patient-table',
+    index: 4,
+    name: '三段式纯白极简升降床 (310kg Couch)',
+    shortLabel: '纯白三段升降床',
+    category: '精密传动',
+    position: new THREE.Vector3(0, 0.86, 2.35),
+    targetView: {
+      position: new THREE.Vector3(-2.15, 1.38, 2.85),
+      target: new THREE.Vector3(0, 0.78, 1.85)
+    },
+    description: '底部采用超薄喷砂阳极氧化铝底座与对接桥板，三段圆角跑道型纯白套筒立柱完全隐藏机械结构，床尾一体成型纯白环状推拉扶手搭配浅鸽灰软垫。',
+    specs: {
+      '最大承重': '310 kg (681 lbs)',
+      '扫描行程': '205 cm 全身大范围移动',
+      '底座材质': '一体喷砂阳极氧化铝地台',
+      '床面软垫': '浅鸽灰抗菌超薄记忆海绵垫'
     }
   },
   {
     id: 'rf-coil',
     index: 5,
-    name: '高密度头颈联合线圈 (RF Head/Neck Coil)',
-    category: '射频系统',
-    position: new THREE.Vector3(0, 0.95, 0.65),
+    name: '纯白开放式头颈线圈 & SuperFlex 毯式线圈',
+    shortLabel: 'uAIFI 射频线圈',
+    category: '高密射频',
+    position: new THREE.Vector3(0, 0.96, 1.08),
     targetView: {
-      position: new THREE.Vector3(0.8, 1.3, 1.2),
-      target: new THREE.Vector3(0, 0.95, 0.65)
+      position: new THREE.Vector3(-1.35, 1.38, 1.95),
+      target: new THREE.Vector3(0, 0.95, 1.25)
     },
-    description: '集成数十通道超高灵敏度射频接收单元，专为颅脑与颈部高分辨率神经解剖成像设计。',
+    description: '点击将自动装配纯白极简开放式头颈联合线圈与 uAIFI SuperFlex 轻薄毯式相控阵线圈，兼顾高通道信噪比与舒适检查体验。',
     specs: {
-      '接收通道': '32 / 64 通道高密度矩阵',
-      '解剖覆盖': '脑部、颈动脉、颈椎一次成像',
-      '舒适设计': '开放式开窗，缓解幽闭恐惧'
+      '体部线圈': 'uAIFI SuperFlex 超柔轻量化毯式线圈',
+      '头颈线圈': '全景大视窗纯白一体式头颈矩阵',
+      '接收通道': '最高支持 96 通道全数字射频'
+    }
+  },
+  {
+    id: 'top-cryo',
+    index: 6,
+    name: '隐藏式 4K 零液氦挥发冷头舱 (Zero Boil-Off)',
+    shortLabel: '隐藏式 4K 冷头舱',
+    category: '超导恒温',
+    position: new THREE.Vector3(-0.62, 2.36, -0.05),
+    targetView: {
+      position: new THREE.Vector3(-2.75, 2.45, 2.35),
+      target: new THREE.Vector3(-0.55, 2.05, -0.05)
+    },
+    description: '顶部圆角纯白一体式设备舱将 4K 制冷冷头与失超管路优雅收纳其中，下方由一道纤细阳极氧化银铝腰线与主柜体分隔。',
+    specs: {
+      '液氦消耗': '0% 零挥发闭环运行 (Zero Boil-Off)',
+      '工作温度': '4.18 K (-269 ℃ 超导液氦温区)',
+      '维护设计': '全封闭纯白降噪整流罩'
     }
   }
 ];

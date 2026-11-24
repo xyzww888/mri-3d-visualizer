@@ -1,29 +1,23 @@
-# MRI 3D Digital Twin Visualizer (Three.js + Blender)
+# UNITED IMAGING · uMR Omega 3.0T — MRI 3D Digital Twin (Three.js + Blender)
 
-高保真核磁共振（MRI）大型医疗设备真实 3D 数字化孪生工程。
+高保真联影风格（uMR Omega 3.0T · 75cm 超大孔径）核磁共振大型医疗设备真实 3D 数字化孪生工程。
 
-本项目构建了 **Blender 工业级 3D 资产管线** 与 **Three.js WebGL 真实感渲染引擎** 的无缝协作工程架构。支持一键加载 Blender 导出的 glTF/GLB PBR 资产，具备医用级演播室照明、检查床平移动画、3D 部件交互标注、参数调节面板及几何工程占位回退机制。
+![uMR Omega 3.0T 3D Preview](./docs/preview_hero.png)
+
+本项目构建了 **Blender 工业级 3D 资产管线** 与 **Three.js WebGL 真实感渲染引擎** 的无缝协作工程架构。内置 1:1 公制联影风格纯白极简 3D 高模（`public/models/mri_scanner.glb`）、Blender 源工程（`blender/mri_scanner.blend`）及全套自动化建模与贴图生成脚本。
 
 ---
 
 ## 🌟 核心特性 (Features)
 
-* **专业渲染引擎配置**:
-  * 基于 `Three.js` (WebGL 2.0)，集成 `ACESFilmicToneMapping` 与高动态光照调节。
-  * `PCFSoftShadowMap` 柔和物理接触阴影与医用洁净地坪反射。
-  * 真实临床演播室多点光照系统（主光、柔光冷补光、轮廓边缘光、孔内 LED 环形呼吸调光）。
-* **Blender 工业建模无缝对接**:
-  * 遵循标准公制与真实 1.5T/3.0T 超导磁共振尺度（机身高 2.2m、孔径 70cm、检查床 2.4m）。
-  * 附带专用的 `blender/export_gltf.py` 自动化导出脚本，内置 Draco 压缩与法线/切线导出优化。
-  * 详尽的 [Blender 建模与导出规范手册](./blender/README.md)。
-* **开箱即用与容错回退机制**:
-  * 在 Blender 美术模型制作完成前，项目内置程序化高保真 **几何工程占位模型**（包含机架外壳、检查孔、电动床台、侧触控屏、头颈线圈）。
-  * 开发者只需将 Blender 导出的 `mri_scanner.glb` 放入 `public/models/`，系统将自动无缝切换至高模显示！
-* **丰富的交互体验**:
-  * **视角预设**: 默认透视、正面机身、孔径特写、检查床位、俯视全景平滑飞跃。
-  * **动态机构交互**: 支持检查床平滑进孔/退孔动画控制。
-  * **3D 数字化热点标注**: 实时投影 3D 浮动标签至屏幕，点击聚焦并展示部件医疗工程规格。
-  * **材质与光照控制面板**: 基于 `lil-gui` 动态微调机壳粗糙度、颜色、孔环发光强度与曝光。
+* **联影 uMR Omega 3.0T 极简工业设计还原 (`Blender 4.x` + `glTF 2.0`)**:
+  * 对标联影官方实机摄影与 Apple 级极简工业美学：左侧垂直落地纯白方体与右侧同心圆弧相切过渡（标志性非对称 P-Arch 建筑体块），顶部采用全封闭圆角纯白恒温冷头舱，底部与顶部镶嵌纤细喷砂阳极氧化银铝饰边。
+  * 外凸纯白圆形前盘外圈环绕一整圈喷砂阳极氧化铝饰环；正面 3 点与 9 点位 **0 凸起纯平嵌入** 同心圆弧梯形曜石黑晶 OLED 触控屏；机身字符与联影 `U` 盾徽采用 2K Alpha 镂空银灰金属贴花直接印制于纯白表面。
+  * **75cm 超大孔径 + 纯白三段式升降床**：纯白一体渐扩喇叭口与底部 U 型床槽、纤细月牙氛围灯条、顶部 Starlight 星空穹顶；三段圆角跑道型纯白套筒升降床搭配喷砂银铝地台、浅鸽灰抗菌软垫与一体环状扶手。
+* **极速加载优化（仅 746 KB）**:
+  * 全四边面精简拓扑 + 高压缩比内嵌贴图，GLB 模型体积缩减至 **746 KB**（较初代缩减近 77%），配合 Vite 分块生产构建实现秒级载入。
+* **纯净白演播室 / 星空暗场双模式 & 97cm 净磁体透视**:
+  * 默认采用联影/Apple 摄影棚无影纯白环氧地坪与柔光箱负补光 IBL；支持一键切换 **星空暗场模式**、**装配/卸下纯白 uAIFI 射频线圈**、**97cm 超导磁体透视剖析** 与 **激光十字定位**。
 
 ---
 
@@ -31,40 +25,40 @@
 
 ```text
 mri-3d-visualizer/
-├── .gitignore                    # Git 忽略配置 (过滤 node_modules, dist, *.blend1 临时文件)
+├── .gitignore                    # Git 忽略配置
 ├── package.json                  # 依赖配置 (Three.js, lil-gui, Vite, TypeScript)
 ├── tsconfig.json                 # TypeScript 严格模式配置
-├── vite.config.ts                # Vite 现代前端构建配置
-├── index.html                    # 宿主页面与现代化 HUD 界面布局
+├── vite.config.ts                # Vite 前端构建配置
+├── index.html                    # 宿主页面与医疗工作站 HUD 界面
 ├── README.md                     # 项目技术文档与开发指引
 │
-├── blender/                      # Blender 建模资产与自动化工具
-│   ├── README.md                 # 3D 建模尺寸规范、PBR 材质节点与层级指南
-│   ├── export_gltf.py            # Blender Python 自动化 Draco 压缩导出脚本
-│   └── textures/                 # 原始贴图与烘焙素材存放目录
+├── blender/                      # Blender 工业建模资产与自动化脚本
+│   ├── README.md                 # 3D 建模尺寸规范、PBR 材质与层级指南
+│   ├── generate_textures.py      # 高清 PBR 贴图程序化生成器 (触控屏UI/铭牌/吸音孔/皮革)
+│   ├── build_mri_scanner.py      # Blender 4.x 全自动工业级 MRI 3D 建模与导出脚本
+│   ├── export_gltf.py            # 独立 glTF/GLB 导出辅助脚本
+│   ├── mri_scanner.blend         # 可直接打开二次编辑的 Blender 源工程文件
+│   └── textures/                 # 高清 PBR 贴图素材
 │
 ├── public/                       # 静态资源
 │   ├── favicon.svg               # 设备 SVG 图标
 │   └── models/                   # WebGL 运行期 3D 模型资产目录
-│       └── mri_scanner.glb       # Blender 导出的最终模型目标路径 (开箱检测)
+│       └── mri_scanner.glb       # 高保真 3.0T MRI glTF 2.0 二进制模型 (已内嵌贴图)
 │
 └── src/                          # 前端源码
-    ├── assets/
-    │   └── styles/
-    │       └── main.css          # 现代化医用工作站主题样式 (Glassmorphism & HUD)
-    ├── config/
-    │   └── constants.ts          # 视角预设、五大核心部件标注数据与配置项
+    ├── assets/styles/main.css    # 现代医用工作站深色玻璃态主题
+    ├── config/constants.ts       # 6 组视角预设与 6 大核心部件工程标注数据
     ├── core/
-    │   ├── Viewer.ts             # 渲染器核心：Scene, Camera, Renderer, OrbitControls
-    │   ├── Lighting.ts           # 医用演播室照明系统 (Key, Fill, Rim, Bore PointLight)
-    │   └── Environment.ts        # 洁净室地坪、五高斯安全警戒线与参考网格
+    │   ├── Viewer.ts             # 渲染器核心、演播室 HDRI IBL 与摄像机过渡
+    │   ├── Lighting.ts           # 医用演播室多点照明、孔环呼吸光与激光十字准直
+    │   └── Environment.ts        # 洁净室反光地坪、五高斯安全警戒线与参考网格
     ├── components/
-    │   ├── ModelLoader.ts        # GLTF/DRACO 加载器与智能回退管理器
-    │   ├── PlaceholderMRI.ts     # 程序化高保真几何工程占位模型
-    │   └── Annotations.ts        # 3D 空间交互标签与视口平滑聚焦
+    │   ├── ModelLoader.ts        # GLTF 加载器、部件绑定、透视剖析与线圈显隐
+    │   ├── PlaceholderMRI.ts     # 几何工程占位回退模型
+    │   └── Annotations.ts        # 3D 空间交互热点标签与视口平滑聚焦
     ├── ui/
-    │   ├── GUIControls.ts        # lil-gui 实时材质与灯光调试面板
-    │   └── LoadingOverlay.ts     # 动态平滑加载遮罩
+    │   ├── GUIControls.ts        # lil-gui 材质、线圈、透视与光照实时参数面板
+    │   └── LoadingOverlay.ts     # 动态加载进度遮罩
     └── main.ts                   # 应用程序主入口
 ```
 

@@ -6,6 +6,15 @@ import { Environment } from '../core/Environment';
 import { LoadedModelResult } from '../components/ModelLoader';
 import { CAMERA_VIEWS } from '../config/constants';
 
+export interface GUICallbacks {
+  onBedToggle: () => void;
+  onCoilsToggle: (enabled: boolean) => void;
+  onCutawayToggle: (enabled: boolean) => void;
+  onLaserToggle: (enabled: boolean) => void;
+  onStudioThemeToggle: (dark: boolean) => void;
+  onHaloPulseToggle: (enabled: boolean) => void;
+}
+
 export class GUIControls {
   private gui: GUI;
 
@@ -14,110 +23,116 @@ export class GUIControls {
     lighting: Lighting,
     environment: Environment,
     model: LoadedModelResult,
-    onBedToggle: () => void
+    callbacks: GUICallbacks
   ) {
-    this.gui = new GUI({ title: 'MRI 渲染与材质参数' });
-    this.gui.close(); // Start collapsed for clean UI
+    this.gui = new GUI({ title: '光影与工程微调' });
+    this.gui.close();
 
-    // 1. Interactive Patient Couch
-    const animFolder = this.gui.addFolder('检查床交互控制');
-    const animParams = {
+    const mechFolder = this.gui.addFolder('检查床与组件控制');
+    const mechParams = {
       progress: 0,
-      toggleAction: () => onBedToggle()
+      toggleAction: () => callbacks.onBedToggle(),
+      mountCoils: false,
+      cutawayMode: false,
+      laserAlignment: false,
+      darkStudio: false
     };
-    animFolder
-      .add(animParams, 'progress', 0, 1, 0.01)
-      .name('平移进孔量')
-      .onChange((v: number) => {
-        model.setBedProgress(v);
-      });
-    animFolder.add(animParams, 'toggleAction').name('一键进孔 / 出孔');
+    mechFolder
+      .add(mechParams, 'progress', 0, 1, 0.01)
+      .name('检查床进孔行程')
+      .onChange((v: number) => model.setBedProgress(v));
+    mechFolder.add(mechParams, 'toggleAction').name('推进 / 退回检查床');
+    mechFolder
+      .add(mechParams, 'mountCoils')
+      .name('装配 uAIFI 射频线圈')
+      .onChange((v: boolean) => callbacks.onCoilsToggle(v));
+    mechFolder
+      .add(mechParams, 'cutawayMode')
+      .name('97cm 净磁体透视')
+      .onChange((v: boolean) => callbacks.onCutawayToggle(v));
+    mechFolder
+      .add(mechParams, 'laserAlignment')
+      .name('激光十字定位线')
+      .onChange((v: boolean) => callbacks.onLaserToggle(v));
+    mechFolder
+      .add(mechParams, 'darkStudio')
+      .name('星空暗场演播室')
+      .onChange((v: boolean) => callbacks.onStudioThemeToggle(v));
 
-    // 2. Material Customization
-    const matFolder = this.gui.addFolder('外观与材质调节');
+    const matFolder = this.gui.addFolder('极简材质与光晕');
     const matParams = {
-      color: '#f3f4f6',
-      roughness: 0.22,
-      haloColor: '#00d2ff',
-      haloIntensity: 3.5
+      color: '#f7f8fa',
+      roughness: 0.20,
+      haloColor: '#6ad8ff',
+      haloIntensity: 2.8,
+      haloBreathing: true
     };
     matFolder
       .addColor(matParams, 'color')
-      .name('机壳颜色')
+      .name('珠光白机壳色温')
       .onChange((c: string) => model.setShellColor(c));
     matFolder
-      .add(matParams, 'roughness', 0.05, 0.9, 0.01)
-      .name('高光粗糙度')
+      .add(matParams, 'roughness', 0.05, 0.85, 0.01)
+      .name('缎面粗糙度')
       .onChange((v: number) => model.setShellRoughness(v));
     matFolder
       .addColor(matParams, 'haloColor')
-      .name('孔环光色')
-      .onChange((c: string) => lighting.setHaloColor(c));
+      .name('孔内月牙光色')
+      .onChange((c: string) => {
+        lighting.setHaloColor(c);
+        model.setHaloColor(c);
+      });
     matFolder
-      .add(matParams, 'haloIntensity', 0, 10, 0.1)
-      .name('孔环亮度')
-      .onChange((v: number) => lighting.setHaloIntensity(v));
+      .add(matParams, 'haloIntensity', 0, 6, 0.1)
+      .name('孔内光晕强度')
+      .onChange((v: number) => {
+        lighting.setHaloIntensity(v * 0.65);
+        model.setHaloIntensity(v);
+      });
+    matFolder
+      .add(matParams, 'haloBreathing')
+      .name('呼吸柔和调光')
+      .onChange((v: boolean) => callbacks.onHaloPulseToggle(v));
 
-    // 3. Lighting Controls
-    const lightFolder = this.gui.addFolder('医用演播室光照');
-    const lightParams = {
+    const envFolder = this.gui.addFolder('摄影棚光照与地坪');
+    const envParams = {
       exposure: viewer.renderer.toneMappingExposure,
-      keyLight: lighting.keyLight.intensity,
-      fillLight: lighting.fillLight.intensity,
-      rimLight: lighting.rimLight.intensity
+      envIntensity: viewer.scene.environmentIntensity,
+      showGrid: false,
+      floorRoughness: 0.28
     };
-    lightFolder
-      .add(lightParams, 'exposure', 0.5, 2.5, 0.05)
-      .name('曝光度 (Exposure)')
+    envFolder
+      .add(envParams, 'exposure', 0.6, 1.8, 0.02)
+      .name('曝光度')
       .onChange((v: number) => {
         viewer.renderer.toneMappingExposure = v;
       });
-    lightFolder
-      .add(lightParams, 'keyLight', 0, 5, 0.1)
-      .name('主光 (Key Light)')
+    envFolder
+      .add(envParams, 'envIntensity', 0.2, 1.6, 0.05)
+      .name('柔光箱反射强度')
       .onChange((v: number) => {
-        lighting.keyLight.intensity = v;
+        viewer.scene.environmentIntensity = v;
       });
-    lightFolder
-      .add(lightParams, 'fillLight', 0, 4, 0.1)
-      .name('辅光 (Fill Light)')
-      .onChange((v: number) => {
-        lighting.fillLight.intensity = v;
-      });
-    lightFolder
-      .add(lightParams, 'rimLight', 0, 5, 0.1)
-      .name('轮廓光 (Rim Light)')
-      .onChange((v: number) => {
-        lighting.rimLight.intensity = v;
-      });
-
-    // 4. Scene Environment
-    const envFolder = this.gui.addFolder('地坪与参考网格');
-    const envParams = {
-      showGrid: true,
-      floorRoughness: 0.35
-    };
     envFolder
       .add(envParams, 'showGrid')
-      .name('显示地坪参考网格')
+      .name('显示辅助测量网格')
       .onChange((show: boolean) => {
         environment.gridHelper.visible = show;
       });
     envFolder
-      .add(envParams, 'floorRoughness', 0.05, 0.9, 0.05)
-      .name('地坪反光粗糙度')
+      .add(envParams, 'floorRoughness', 0.05, 0.85, 0.05)
+      .name('环氧地坪粗糙度')
       .onChange((v: number) => {
         (environment.floorMesh.material as THREE.MeshStandardMaterial).roughness = v;
       });
 
-    // 5. Preset Views in GUI
-    const viewFolder = this.gui.addFolder('快速视角预设');
+    const viewFolder = this.gui.addFolder('快速视角切换');
     Object.keys(CAMERA_VIEWS).forEach((k) => {
       const preset = CAMERA_VIEWS[k];
       viewFolder
         .add(
           {
-            fn: () => viewer.animateCameraTo(preset.position, preset.target, 1.2)
+            fn: () => viewer.animateCameraTo(preset.position, preset.target, 1.15)
           },
           'fn'
         )

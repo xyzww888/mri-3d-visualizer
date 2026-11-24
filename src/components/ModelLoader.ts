@@ -13,6 +13,10 @@ export interface LoadedModelResult {
   setBedProgress: (t: number) => void;
   setShellColor: (color: string) => void;
   setShellRoughness: (val: number) => void;
+  setHaloColor: (color: string) => void;
+  setHaloIntensity: (val: number) => void;
+  setCutaway: (enabled: boolean) => void;
+  setCoilVisibility: (coil: 'head' | 'body', visible: boolean) => void;
   setWireframe: (wireframe: boolean) => void;
 }
 
@@ -32,49 +36,99 @@ export class ModelLoader {
     onProgress: (percent: number, msg: string) => void
   ): Promise<LoadedModelResult> {
     return new Promise((resolve) => {
-      onProgress(15, '正在检索 Blender 导出的 GLB 模型...');
+      onProgress(15, '正在载入联影 uMR Omega 3.0T 高保真模型...');
 
       this.gltfLoader.load(
         MODEL_CONFIG.gltfPath,
         (gltf) => {
-          onProgress(85, '解析模型网格与 PBR 材质...');
+          onProgress(85, '初始化极简珠光白与阳极氧化铝 PBR 材质...');
           const root = gltf.scene;
           root.name = 'MRI_Real_GLB';
 
           let movableBed: THREE.Object3D | null = null;
           let haloMesh: THREE.Mesh | null = null;
-          const meshes: THREE.Mesh[] = [];
+          let cryostatGroup: THREE.Object3D | null = null;
+          let headCoilGroup: THREE.Object3D | null = null;
+          let bodyCoilGroup: THREE.Object3D | null = null;
+
+          const allMeshes: THREE.Mesh[] = [];
+          const shellMaterials = new Set<THREE.MeshStandardMaterial>();
+          const haloMaterials = new Set<THREE.MeshStandardMaterial>();
+          const cutawayOuterMeshes: { mesh: THREE.Mesh; clonedMat: THREE.MeshStandardMaterial }[] = [];
+
+          const cutawayMeshNames = new Set([
+            'gantry_shell_main',
+            'gantry_top_cryo_shroud',
+            'medallion_white_face',
+            'bore_lining',
+            'bore_starlight_canopy'
+          ]);
 
           root.traverse((child) => {
+            const lname = child.name.toLowerCase();
+
+            if (lname === 'table_couch_movable' || (!movableBed && lname.includes('table_couch'))) {
+              movableBed = child;
+            }
+            if (lname === 'mri_internal_cryostat') {
+              cryostatGroup = child;
+            }
+            if (lname === 'coil_head_matrix') {
+              headCoilGroup = child;
+            }
+            if (lname === 'coil_body_array') {
+              bodyCoilGroup = child;
+            }
+
             if ((child as THREE.Mesh).isMesh) {
               const mesh = child as THREE.Mesh;
-              mesh.castShadow = true;
-              mesh.receiveShadow = true;
-              meshes.push(mesh);
+              // Brand decals shouldn't cast floating shadows
+              const isDecal = lname.startsWith('decal_');
+              mesh.castShadow = !isDecal;
+              mesh.receiveShadow = !isDecal;
+              allMeshes.push(mesh);
 
-              // Auto-detect movable patient couch
-              if (
-                mesh.name.toLowerCase().includes('bed') ||
-                mesh.name.toLowerCase().includes('couch') ||
-                mesh.name.toLowerCase().includes('table_couch')
-              ) {
-                movableBed = mesh;
+              if (!haloMesh && lname.includes('bore_halo_light')) {
+                haloMesh = mesh;
               }
 
-              // Auto-detect halo light ring
-              if (
-                mesh.name.toLowerCase().includes('halo') ||
-                mesh.name.toLowerCase().includes('ring_light')
-              ) {
-                haloMesh = mesh;
+              const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+              mats.forEach((m) => {
+                const std = m as THREE.MeshStandardMaterial;
+                if (!std) return;
+                const matName = (std.name || '').toLowerCase();
+                if (matName.includes('mat_mri_shell')) {
+                  shellMaterials.add(std);
+                }
+                if (matName.includes('mat_mri_halo')) {
+                  haloMaterials.add(std);
+                }
+              });
+
+              if (cutawayMeshNames.has(lname)) {
+                const orig = mesh.material as THREE.MeshStandardMaterial;
+                if (orig) {
+                  const cloned = orig.clone();
+                  mesh.material = cloned;
+                  if ((orig.name || '').toLowerCase().includes('mat_mri_shell')) {
+                    shellMaterials.add(cloned);
+                  }
+                  cutawayOuterMeshes.push({ mesh, clonedMat: cloned });
+                }
               }
             }
           });
 
-          scene.add(root);
-          onProgress(100, 'Blender 模型加载完成');
+          // Default state: pure uncluttered Apple/UIH showroom look (coils & cryostat toggleable!)
+          if (cryostatGroup) (cryostatGroup as THREE.Object3D).visible = false;
+          if (headCoilGroup) (headCoilGroup as THREE.Object3D).visible = false;
+          if (bodyCoilGroup) (bodyCoilGroup as THREE.Object3D).visible = false;
 
-          let initialBedZ = movableBed ? (movableBed as THREE.Object3D).position.z : 0;
+          scene.add(root);
+          onProgress(100, '联影 uMR Omega 3.0T 模型就绪');
+
+          const initialBedZ = movableBed ? (movableBed as THREE.Object3D).position.z : 1.94;
+          const bedTravelDistance = 1.30;
 
           const result: LoadedModelResult = {
             root,
@@ -83,27 +137,50 @@ export class ModelLoader {
             haloMesh,
             setBedProgress: (t: number) => {
               if (movableBed) {
-                (movableBed as THREE.Object3D).position.z = initialBedZ - t * 1.2;
+                const clamped = Math.max(0, Math.min(1, t));
+                (movableBed as THREE.Object3D).position.z = initialBedZ - clamped * bedTravelDistance;
               }
             },
             setShellColor: (color: string) => {
-              meshes.forEach((m) => {
-                const mat = m.material as THREE.MeshStandardMaterial;
-                if (mat && mat.color && !m.name.includes('Light') && !m.name.includes('Screen')) {
-                  mat.color.set(color);
-                }
-              });
+              shellMaterials.forEach((mat) => mat.color.set(color));
             },
             setShellRoughness: (val: number) => {
-              meshes.forEach((m) => {
-                const mat = m.material as THREE.MeshStandardMaterial;
-                if (mat && typeof mat.roughness === 'number') {
-                  mat.roughness = val;
-                }
+              shellMaterials.forEach((mat) => {
+                mat.roughness = val;
               });
             },
+            setHaloColor: (color: string) => {
+              haloMaterials.forEach((mat) => {
+                mat.color.set(color);
+                mat.emissive.set(color);
+              });
+            },
+            setHaloIntensity: (val: number) => {
+              haloMaterials.forEach((mat) => {
+                mat.emissiveIntensity = val;
+              });
+            },
+            setCutaway: (enabled: boolean) => {
+              if (cryostatGroup) {
+                (cryostatGroup as THREE.Object3D).visible = enabled;
+              }
+              cutawayOuterMeshes.forEach(({ clonedMat }) => {
+                clonedMat.transparent = enabled;
+                clonedMat.opacity = enabled ? 0.16 : 1.0;
+                clonedMat.depthWrite = !enabled;
+                clonedMat.needsUpdate = true;
+              });
+            },
+            setCoilVisibility: (coil: 'head' | 'body', visible: boolean) => {
+              if (coil === 'head' && headCoilGroup) {
+                (headCoilGroup as THREE.Object3D).visible = visible;
+              }
+              if (coil === 'body' && bodyCoilGroup) {
+                (bodyCoilGroup as THREE.Object3D).visible = visible;
+              }
+            },
             setWireframe: (wf: boolean) => {
-              meshes.forEach((m) => {
+              allMeshes.forEach((m) => {
                 if (Array.isArray(m.material)) {
                   m.material.forEach((mat) => {
                     if ('wireframe' in mat) (mat as THREE.MeshStandardMaterial).wireframe = wf;
@@ -120,14 +197,11 @@ export class ModelLoader {
         (xhr) => {
           if (xhr.lengthComputable) {
             const percent = Math.round((xhr.loaded / xhr.total) * 70) + 15;
-            onProgress(percent, `正在下载 GLB 模型: ${(xhr.loaded / 1024 / 1024).toFixed(1)} MB`);
+            onProgress(percent, `正在载入模型: ${(xhr.loaded / 1024).toFixed(0)} KB`);
           }
         },
         (error) => {
-          console.warn('[ModelLoader] 未在 /public/models/ 发现 mri_scanner.glb 或加载失败:', error);
-          onProgress(70, '未发现外部 GLB，自动启用高保真几何工程占位模型...');
-
-          // Graceful fallback to procedural placeholder model
+          console.warn('[ModelLoader] 未发现 mri_scanner.glb，启用占位模型:', error);
           const placeholder = new PlaceholderMRI();
           scene.add(placeholder.group);
 
@@ -136,26 +210,27 @@ export class ModelLoader {
             if ((c as THREE.Mesh).isMesh) meshes.push(c as THREE.Mesh);
           });
 
-          setTimeout(() => {
-            onProgress(100, '几何工程占位模型准备就绪');
-            resolve({
-              root: placeholder.group,
-              isRealGLB: false,
-              movableBed: placeholder.movableBed,
-              haloMesh: placeholder.haloLightMesh,
-              placeholderInstance: placeholder,
-              setBedProgress: (t: number) => placeholder.setBedProgress(t),
-              setShellColor: (color: string) => placeholder.setShellColor(color),
-              setShellRoughness: (val: number) => placeholder.setShellRoughness(val),
-              setWireframe: (wf: boolean) => {
-                meshes.forEach((m) => {
-                  if (m.material && 'wireframe' in m.material) {
-                    (m.material as THREE.MeshStandardMaterial).wireframe = wf;
-                  }
-                });
-              }
-            });
-          }, 400);
+          resolve({
+            root: placeholder.group,
+            isRealGLB: false,
+            movableBed: placeholder.movableBed,
+            haloMesh: placeholder.haloLightMesh,
+            placeholderInstance: placeholder,
+            setBedProgress: (t: number) => placeholder.setBedProgress(t),
+            setShellColor: (color: string) => placeholder.setShellColor(color),
+            setShellRoughness: (val: number) => placeholder.setShellRoughness(val),
+            setHaloColor: () => {},
+            setHaloIntensity: () => {},
+            setCutaway: () => {},
+            setCoilVisibility: () => {},
+            setWireframe: (wf: boolean) => {
+              meshes.forEach((m) => {
+                if (m.material && 'wireframe' in m.material) {
+                  (m.material as THREE.MeshStandardMaterial).wireframe = wf;
+                }
+              });
+            }
+          });
         }
       );
     });

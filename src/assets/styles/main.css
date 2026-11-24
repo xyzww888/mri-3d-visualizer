@@ -1,25 +1,42 @@
 /* ==========================================================================
-   MRI 3D Visualizer - Master Stylesheet
-   Medical Engineering & Modern Glassmorphism Theme
+   UNITED IMAGING uMR Omega 3.0T — Apple-Grade Industrial Minimalist Theme
+   Default: Pure Frosted White Gallery | Optional: Starlight Dark Studio
    ========================================================================== */
 
 :root {
-  --bg-primary: #0a0e17;
-  --bg-panel: rgba(15, 23, 42, 0.75);
-  --bg-panel-border: rgba(56, 189, 248, 0.2);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-cyan: #00d2ff;
-  --accent-blue: #0284c7;
-  --accent-glow: rgba(0, 210, 255, 0.35);
-  --success: #10b981;
-  --warning: #f59e0b;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --panel-backdrop: blur(12px);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --bg-canvas: #e8ecf2;
+  --surface-panel: rgba(255, 255, 255, 0.76);
+  --surface-border: rgba(15, 23, 42, 0.08);
+  --surface-shadow: 0 12px 32px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --btn-bg: rgba(241, 245, 249, 0.85);
+  --btn-hover: rgba(226, 232, 240, 0.95);
+  --btn-border: rgba(15, 23, 42, 0.07);
+  --text-primary: #1d1d1f;
+  --text-secondary: #515154;
+  --text-muted: #86868b;
+  --accent-uih: #0066cc;
+  --accent-uih-hover: #0055b3;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC",
+    "Helvetica Neue", Arial, sans-serif;
+  --panel-backdrop: blur(22px) saturate(180%);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+}
+
+#app.theme-dark {
+  --bg-canvas: #0a0f1a;
+  --surface-panel: rgba(15, 23, 42, 0.76);
+  --surface-border: rgba(255, 255, 255, 0.10);
+  --surface-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --btn-bg: rgba(30, 41, 59, 0.72);
+  --btn-hover: rgba(51, 65, 85, 0.88);
+  --btn-border: rgba(255, 255, 255, 0.10);
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-muted: #6e6e73;
+  --accent-uih: #0a84ff;
+  --accent-uih-hover: #0070e0;
 }
 
 * {
@@ -28,11 +45,12 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-primary);
+  background-color: var(--bg-canvas);
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -44,6 +62,8 @@ html, body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  color: var(--text-primary);
+  transition: color 0.25s ease;
 }
 
 #webgl {
@@ -57,209 +77,198 @@ html, body {
 }
 
 /* ==========================================================================
-   Header / Top Navigation
+   Minimalist Frosted Top Bar
    ========================================================================== */
 .hud-header {
   position: absolute;
   top: 16px;
   left: 20px;
   right: 20px;
-  height: 64px;
-  background: var(--bg-panel);
+  height: 58px;
+  background: var(--surface-panel);
   backdrop-filter: var(--panel-backdrop);
   -webkit-backdrop-filter: var(--panel-backdrop);
-  border: 1px solid var(--bg-panel-border);
+  border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 22px;
   z-index: 10;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--surface-shadow);
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .hud-brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 13px;
 }
 
 .hud-logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(0, 210, 255, 0.1);
-  border: 1px solid rgba(0, 210, 255, 0.3);
-  border-radius: var(--radius-md);
-  box-shadow: 0 0 16px var(--accent-glow);
+  width: 36px;
+  height: 36px;
+  background: rgba(15, 23, 42, 0.05);
+  border-radius: 10px;
+  color: var(--text-primary);
+}
+
+#app.theme-dark .hud-logo {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .hud-title-group h1 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
 }
 
 .hud-title-group p {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-secondary);
+  letter-spacing: 0.01em;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 6px 14px;
+  gap: 7px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 5px 13px;
   border-radius: 9999px;
-  border: 1px solid transparent;
+  background: rgba(15, 23, 42, 0.045);
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
+}
+
+#app.theme-dark .badge {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .badge-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  animation: pulse-dot 2s infinite ease-in-out;
-}
-
-.badge-success {
-  background: rgba(16, 185, 129, 0.15);
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #34d399;
-}
-.badge-success .badge-dot {
   background: #10b981;
-  box-shadow: 0 0 8px #10b981;
 }
 
-.badge-warning {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.4);
-  color: #fbbf24;
-}
 .badge-warning .badge-dot {
   background: #f59e0b;
-  box-shadow: 0 0 8px #f59e0b;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
 }
 
 /* ==========================================================================
-   Left Floating Toolbar
+   Left Minimalist Control Dock
    ========================================================================== */
 .hud-sidebar {
   position: absolute;
-  top: 96px;
+  top: 88px;
   left: 20px;
-  width: 250px;
-  background: var(--bg-panel);
+  width: 236px;
+  background: var(--surface-panel);
   backdrop-filter: var(--panel-backdrop);
   -webkit-backdrop-filter: var(--panel-backdrop);
-  border: 1px solid var(--bg-panel-border);
+  border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
-  padding: 18px;
+  padding: 16px;
   z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  gap: 15px;
+  box-shadow: var(--surface-shadow);
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .sidebar-section h3 {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  letter-spacing: 0.8px;
-  margin-bottom: 10px;
+  font-size: 0.69rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
 }
 
 .view-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.view-buttons button:first-child {
-  grid-column: span 2;
+  gap: 6px;
 }
 
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 0.8rem;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 0.77rem;
   font-weight: 500;
-  padding: 8px 12px;
+  padding: 7.5px 10px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--btn-border);
+  transition: background 0.16s ease, color 0.16s ease, transform 0.12s ease;
+  background: var(--btn-bg);
   color: var(--text-primary);
 }
 
 .btn:hover {
-  background: rgba(51, 65, 85, 0.9);
-  border-color: rgba(56, 189, 248, 0.4);
-  transform: translateY(-1px);
+  background: var(--btn-hover);
+}
+
+.btn:active {
+  transform: scale(0.985);
 }
 
 .btn.active {
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.7), rgba(0, 210, 255, 0.8));
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 12px var(--accent-glow);
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: #ffffff;
+}
+
+#app.theme-dark .btn.active {
+  background: var(--accent-uih);
+  border-color: var(--accent-uih);
   color: #ffffff;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #0284c7 0%, #00d2ff 100%);
-  color: #0f172a;
-  font-weight: 600;
-  border: none;
-  box-shadow: 0 4px 14px rgba(0, 210, 255, 0.3);
+  background: var(--accent-uih);
+  border-color: var(--accent-uih);
+  color: #ffffff;
+  font-weight: 500;
 }
 
 .btn-primary:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 6px 20px rgba(0, 210, 255, 0.45);
+  background: var(--accent-uih-hover);
 }
 
 .btn-outline {
-  background: transparent;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: var(--btn-bg);
   color: var(--text-secondary);
 }
 
 .btn-outline:hover {
   color: var(--text-primary);
-  border-color: var(--accent-cyan);
 }
 
 .sidebar-tip {
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   color: var(--text-muted);
-  line-height: 1.6;
+  text-align: center;
+  letter-spacing: 0.02em;
 }
 
 /* ==========================================================================
-   3D Annotations / Markers
+   3D Minimalist Annotations
    ========================================================================== */
 .annotations-overlay {
   position: absolute;
@@ -278,68 +287,68 @@ html, body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: opacity 0.3s ease, transform 0.2s ease;
+  gap: 6px;
+  transition: opacity 0.25s ease, transform 0.18s ease;
   user-select: none;
 }
 
 .marker-pin {
-  width: 24px;
-  height: 24px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 2px solid var(--accent-cyan);
+  width: 22px;
+  height: 22px;
+  background: #1d1d1f;
+  border: 1.5px solid #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
-  font-weight: bold;
-  color: var(--accent-cyan);
-  box-shadow: 0 0 14px var(--accent-glow);
-  transition: all 0.2s ease;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.22);
+  transition: transform 0.18s ease, background 0.18s ease;
 }
 
 .annotation-marker:hover .marker-pin {
-  transform: scale(1.2);
-  background: var(--accent-cyan);
-  color: #0f172a;
+  transform: scale(1.14);
+  background: var(--accent-uih);
 }
 
 .marker-label {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
+  background: var(--surface-panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--surface-border);
+  padding: 3.5px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
   font-weight: 500;
-  color: #f8fafc;
+  color: var(--text-primary);
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
 /* ==========================================================================
-   Detail Info Modal
+   Detail Spec Card
    ========================================================================== */
 .info-card {
   position: absolute;
-  bottom: 24px;
-  right: 24px;
-  width: 320px;
-  background: var(--bg-panel);
+  bottom: 22px;
+  right: 22px;
+  width: 316px;
+  background: var(--surface-panel);
   backdrop-filter: var(--panel-backdrop);
   -webkit-backdrop-filter: var(--panel-backdrop);
-  border: 1px solid var(--bg-panel-border);
+  border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   padding: 20px;
   z-index: 10;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--surface-shadow);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .info-card.hidden {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(14px);
   pointer-events: none;
 }
 
@@ -350,7 +359,7 @@ html, body {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   cursor: pointer;
   line-height: 1;
 }
@@ -360,24 +369,24 @@ html, body {
 }
 
 .info-tag {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--accent-cyan);
-  margin-bottom: 6px;
-  letter-spacing: 0.5px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--accent-uih);
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
 }
 
 .info-card h2 {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .info-card p {
-  font-size: 0.82rem;
+  font-size: 0.79rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 12px;
 }
 
@@ -385,14 +394,14 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--surface-border);
   padding-top: 10px;
 }
 
 .spec-item {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.74rem;
 }
 
 .spec-name {
@@ -400,12 +409,12 @@ html, body {
 }
 
 .spec-value {
-  color: var(--accent-cyan);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 /* ==========================================================================
-   Loading Overlay
+   Clean Gallery Loading Overlay
    ========================================================================== */
 .loading-overlay {
   position: absolute;
@@ -413,12 +422,12 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: #06090e;
+  background: #eceff4;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
 }
 
 .loading-overlay.fade-out {
@@ -427,23 +436,24 @@ html, body {
 }
 
 .loading-card {
-  width: 380px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid var(--bg-panel-border);
+  width: 340px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(15, 23, 42, 0.07);
   border-radius: var(--radius-lg);
-  padding: 36px 30px;
+  padding: 32px 28px;
   text-align: center;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
 }
 
 .loading-spinner {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 20px;
-  border: 3px solid rgba(0, 210, 255, 0.15);
-  border-top: 3px solid var(--accent-cyan);
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 16px;
+  border: 2.5px solid rgba(15, 23, 42, 0.10);
+  border-top-color: #1d1d1f;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.85s linear infinite;
 }
 
 @keyframes spin {
@@ -452,52 +462,74 @@ html, body {
 }
 
 .loading-card h2 {
-  font-size: 1.15rem;
-  margin-bottom: 18px;
-  color: #ffffff;
+  font-size: 0.96rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: #1d1d1f;
 }
 
 .progress-bar-container {
   width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.08);
+  height: 4px;
+  background: rgba(15, 23, 42, 0.08);
   border-radius: 9999px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #0284c7, #00d2ff);
-  box-shadow: 0 0 10px var(--accent-glow);
-  transition: width 0.3s ease;
+  background: #1d1d1f;
+  transition: width 0.2s ease;
 }
 
 .loading-sub {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
+  font-size: 0.74rem;
+  color: #6e6e73;
 }
 
 /* ==========================================================================
-   lil-gui Overrides for Cyber/Medical Theme
+   lil-gui Clean Minimalist Overrides
    ========================================================================== */
 .lil-gui {
-  --background-color: rgba(15, 23, 42, 0.85) !important;
-  --text-color: #e2e8f0 !important;
-  --title-background-color: rgba(30, 41, 59, 0.9) !important;
-  --widget-color: rgba(51, 65, 85, 0.8) !important;
-  --hover-color: rgba(71, 85, 105, 0.9) !important;
-  --focus-color: var(--accent-cyan) !important;
-  --number-color: var(--accent-cyan) !important;
-  --string-color: #38bdf8 !important;
+  --background-color: rgba(255, 255, 255, 0.86) !important;
+  --text-color: #1d1d1f !important;
+  --title-background-color: rgba(241, 245, 249, 0.92) !important;
+  --title-text-color: #1d1d1f !important;
+  --widget-color: rgba(226, 232, 240, 0.9) !important;
+  --hover-color: rgba(203, 213, 225, 0.95) !important;
+  --focus-color: #0066cc !important;
+  --number-color: #0066cc !important;
+  --string-color: #1d1d1f !important;
   font-family: var(--font-sans) !important;
   border-radius: var(--radius-md) !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: var(--surface-shadow) !important;
   backdrop-filter: var(--panel-backdrop) !important;
-  border: 1px solid var(--bg-panel-border) !important;
+  border: 1px solid var(--surface-border) !important;
+}
+
+#app.theme-dark .lil-gui {
+  --background-color: rgba(15, 23, 42, 0.85) !important;
+  --text-color: #f5f5f7 !important;
+  --title-background-color: rgba(30, 41, 59, 0.9) !important;
+  --title-text-color: #f5f5f7 !important;
+  --widget-color: rgba(51, 65, 85, 0.8) !important;
+  --hover-color: rgba(71, 85, 105, 0.9) !important;
+  --number-color: #38bdf8 !important;
 }
 
 .lil-gui.root {
-  top: 96px !important;
+  top: 88px !important;
   right: 20px !important;
+}
+
+@media (max-width: 768px) {
+  .hud-sidebar {
+    width: 196px;
+    padding: 12px;
+  }
+  .info-card {
+    width: calc(100vw - 40px);
+    right: 20px;
+  }
 }

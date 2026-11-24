@@ -7,30 +7,37 @@ export class Annotations {
   private container: HTMLElement;
   private markers: { element: HTMLElement; data: AnnotationItem }[] = [];
   private infoModal: HTMLElement;
+  private infoTag: HTMLElement;
   private infoTitle: HTMLElement;
   private infoDesc: HTMLElement;
   private infoSpecs: HTMLElement;
-  private isVisible: boolean = true;
+  private isVisible: boolean = false; // Default clean unobstructed Apple/UIH showroom view!
+  private onSelectCallback?: (item: AnnotationItem) => void;
 
-  constructor(viewer: Viewer) {
+  constructor(viewer: Viewer, onSelect?: (item: AnnotationItem) => void) {
     this.viewer = viewer;
+    this.onSelectCallback = onSelect;
 
     const cont = document.getElementById('annotations-container');
     const modal = document.getElementById('info-modal');
+    const tag = document.getElementById('info-tag');
     const title = document.getElementById('info-title');
     const desc = document.getElementById('info-desc');
     const specs = document.getElementById('info-specs');
     const closeBtn = document.getElementById('btn-close-modal');
 
-    if (!cont || !modal || !title || !desc || !specs) {
+    if (!cont || !modal || !tag || !title || !desc || !specs) {
       throw new Error('Annotations DOM elements missing.');
     }
 
     this.container = cont;
     this.infoModal = modal;
+    this.infoTag = tag;
     this.infoTitle = title;
     this.infoDesc = desc;
     this.infoSpecs = specs;
+
+    this.container.style.display = 'none';
 
     if (closeBtn) {
       closeBtn.addEventListener('click', () => this.hideModal());
@@ -46,7 +53,7 @@ export class Annotations {
       el.className = 'annotation-marker';
       el.innerHTML = `
         <div class="marker-pin">${item.index}</div>
-        <div class="marker-label">${item.name.split(' ')[0]}</div>
+        <div class="marker-label">${item.shortLabel}</div>
       `;
 
       el.addEventListener('click', (e) => {
@@ -60,10 +67,13 @@ export class Annotations {
   }
 
   public selectAnnotation(item: AnnotationItem) {
-    // 1. Move camera to target
-    this.viewer.animateCameraTo(item.targetView.position, item.targetView.target, 1.2);
+    if (this.onSelectCallback) {
+      this.onSelectCallback(item);
+    }
 
-    // 2. Populate modal info
+    this.viewer.animateCameraTo(item.targetView.position, item.targetView.target, 1.15);
+
+    this.infoTag.textContent = item.category;
     this.infoTitle.textContent = item.name;
     this.infoDesc.textContent = item.description;
 
@@ -77,8 +87,6 @@ export class Annotations {
       `;
     }
     this.infoSpecs.innerHTML = specsHtml;
-
-    // 3. Show modal
     this.infoModal.classList.remove('hidden');
   }
 
@@ -86,7 +94,7 @@ export class Annotations {
     this.infoModal.classList.add('hidden');
   }
 
-  public toggleVisibility() {
+  public toggleVisibility(): boolean {
     this.isVisible = !this.isVisible;
     this.container.style.display = this.isVisible ? 'block' : 'none';
     if (!this.isVisible) this.hideModal();
@@ -99,14 +107,12 @@ export class Annotations {
     const camera = this.viewer.camera;
     const widthHalf = window.innerWidth / 2;
     const heightHalf = window.innerHeight / 2;
-
     const tempV = new THREE.Vector3();
 
     this.markers.forEach(({ element, data }) => {
       tempV.copy(data.position);
       tempV.project(camera);
 
-      // Check if behind camera
       if (tempV.z > 1) {
         element.style.opacity = '0';
         element.style.pointerEvents = 'none';
