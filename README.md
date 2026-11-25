@@ -129,3 +129,31 @@ git push -u origin main
 ## 📄 开源许可证 (License)
 
 本项目采用 [MIT License](https://opensource.org/licenses/MIT) 开源许可证。
+
+
+---
+
+## 🔬 新增：MR / MI / CT 三模态设备矩阵与云端精修指南
+
+本仓库现已扩充支持联影三大旗舰模态设备，顶部导航栏可直接切换预览（亦可通过 `?model=uexplorer` 或 `?model=uct` 参数直达）：
+
+| 模态 | 机型 | 运行时模型路径 | Blender 自动化生成脚本 |
+| :--- | :--- | :--- | :--- |
+| **MR** | **uMR Omega 3.0T**（75cm 孔径 · 97cm 超导磁体） | `public/models/mri_scanner.glb` | `blender/generate_textures.py` + `blender/build_mri_scanner.py` |
+| **MI** | **uEXPLORER® 探索者**（76cm 孔径 · 194cm 8环全景 PET + 160层 CT） | `public/models/uexplorer.glb` | `blender/generate_uexplorer_textures.py` + `blender/build_uexplorer.py` |
+| **CT** | **uCT 960+ 宽体螺旋CT**（82cm 孔径 · 320排宽体探测器） | `public/models/uct_scanner.glb` | `blender/build_uexplorer.py -- --ct-only` |
+
+### 云端 Blender 一键重烘焙命令 (`uEXPLORER` & `uCT 960+`)
+
+在云端工作站完成 `build_uexplorer.py` 细节调优后，执行以下命令即可更新 `.blend` 源工程并直接覆盖 `public/models/` 下的 `.glb` 模型：
+
+```bash
+# 1. 生成 2K 联影品牌贴花、四联触控屏 UI 与星空孔道贴图
+python blender/generate_uexplorer_textures.py
+
+# 2. 烘焙导出 MI 旗舰：uEXPLORER 探索者 -> public/models/uexplorer.glb & blender/uexplorer.blend
+blender --background --python blender/build_uexplorer.py
+
+# 3. 烘焙导出派生 CT：uCT 960+ -> public/models/uct_scanner.glb & blender/uct_scanner.blend
+blender --background --python blender/build_uexplorer.py -- --ct-only
+```

@@ -11,10 +11,10 @@ export class Annotations {
   private infoTitle: HTMLElement;
   private infoDesc: HTMLElement;
   private infoSpecs: HTMLElement;
-  private isVisible: boolean = false; // Default clean unobstructed Apple/UIH showroom view!
+  private isVisible = false;
   private onSelectCallback?: (item: AnnotationItem) => void;
 
-  constructor(viewer: Viewer, onSelect?: (item: AnnotationItem) => void) {
+  constructor(viewer: Viewer, onSelect?: (item: AnnotationItem) => void, initialItems: AnnotationItem[] = ANNOTATIONS_DATA) {
     this.viewer = viewer;
     this.onSelectCallback = onSelect;
 
@@ -43,12 +43,16 @@ export class Annotations {
       closeBtn.addEventListener('click', () => this.hideModal());
     }
 
-    this.initMarkers();
+    this.setItems(initialItems);
     this.viewer.registerUpdate(() => this.updatePositions());
   }
 
-  private initMarkers() {
-    ANNOTATIONS_DATA.forEach((item) => {
+  public setItems(items: AnnotationItem[]) {
+    this.container.innerHTML = '';
+    this.markers = [];
+    this.hideModal();
+
+    items.forEach((item) => {
       const el = document.createElement('div');
       el.className = 'annotation-marker';
       el.innerHTML = `
